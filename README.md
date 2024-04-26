@@ -18,7 +18,7 @@ We're excited to announce that our latest script, KOJA-CRAFTING, is now availabl
 
 ## Dependencies
 - [OX-INVENTORY](https://github.com/overextended/ox_inventory)
-- [OX-MYSQL / MYSQL](https://github.com/overextended/oxmysql))
+- [OX-MYSQL / MYSQL](https://github.com/overextended/oxmysql)
 - [OX-TARGET](https://github.com/overextended/ox_target)
   
 ## Socials
