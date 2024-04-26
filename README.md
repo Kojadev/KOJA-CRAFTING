@@ -17,10 +17,10 @@ We're excited to announce that our latest script, KOJA-CRAFTING, is now availabl
 - Discord logging to a webhook
 
 ## Dependencies
-
-- OX-INVENTORY
-- OX-TARGET
-- OX-MYSQL / MYSQL
+- [OX-INVENTORY](https://github.com/overextended/ox_inventory)
+- [OX-MYSQL / MYSQL](https://github.com/overextended/oxmysql))
+- [OX-TARGET](https://github.com/overextended/ox_target)
+  
 ## Socials
 
 - [@DISCORD](https://www.discord.gg/kojascripts)
