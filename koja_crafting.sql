@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS `koja_crafting` (
+  `#` int(11) NOT NULL AUTO_INCREMENT,
+  `playerid` varchar(50) DEFAULT NULL,
+  `currentXP` int(11) DEFAULT NULL,
+  PRIMARY KEY (`#`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;

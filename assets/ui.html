@@ -1,0 +1,196 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="https://kit-pro.fontawesome.com/releases/v6.1.1/css/pro.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="crafting_queue_list">
+
+    </div>
+    <div class="main">
+        <div class="main_top">
+            <div class="main_top_left">
+                <div class="desc">
+                    <div class="title">CRAFTING</div>
+                    <div class="title2">SYSTEM</div>
+                </div>
+            </div>
+            <div class="main_top_right">
+                <div class="category_list">
+                    <div class="category_list_title">Categories</div>
+                    <div class="category_items">
+
+                    </div>
+                </div>
+
+                <div class="profile_main">
+
+                    <div class="profile_right">
+                        <div class="profile_inside_content">
+                            <div class="profile_level_base">
+                                <div class="profile_level_text">
+                                    <div class="profile_level_levelcount">Level.1</div>
+                                    <div class="profile_level_xpcount">0/75 XP</div>
+                                </div>
+                                <div class="profle_level_bar">
+                                    <div class="profile_level_progress">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="main_bottom">
+            <div class="main_bottom_left">
+                <div class="search_box">
+                    <div class="search_icon">
+                        <i class="fa-regular fa-magnifying-glass"></i>
+                    </div>
+                    <input class="inputBox" id="inputBox" type="text" placeholder="Search">
+                </div>
+
+                <div class="items_list">
+                    <div class="item_window">
+                        <div class="item_window_left">
+                            <div class="item_window_icon">
+                                <img src="/assets/images/combatpistol.png">
+                            </div>
+                        </div>
+                        <div class="item_window_right">
+                            <div class="item_window_right_label">Combat Pistol</div>
+                            <div class="item_window_right_category">Broń</div>
+                            <div class="item_window_right_stats">
+                                <div class="item_window_right_time">125s</div>
+                                <div class="item_window_right_lvl">3.lvl</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="main_bottom_right">
+                <div class="bottom_middle">
+                    <div class="middle_top">
+
+                        <div class="middle_top_left">
+                            <div class="image_bg">
+
+                                <img class="crafting_item" src="/assets/images/combatpistol.png">
+                            </div>
+                        </div>
+
+                        <div class="middle_top_right">
+                            <div class="right_x1">
+                                <div class="crafting_label">Combat Pistol</div>
+                                <div class="crafting_class">Broń</div>
+                            </div>
+                            <div class="right_x2">
+                                <div class="crafting_desc">
+                                    <span style="font-weight: 600;">Kategoria:</span> Pistolet <br>
+                                    <span style="font-weight: 600;">Producent:</span> Hawk & Little <br>
+                                    <span style="font-weight: 600;">Opis:</span> Combat Pistol to solidny pistolet,
+                                    charakteryzujący się dobrą celnością i mocą
+                                    ognia. Jest to popularna broń wśród graczy, umożliwiająca precyzyjne strzały z
+                                    dystansu, a jednocześnie poręczna do noszenia.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="middle_bottom">
+                        <div class="top_x1">
+                            <div class="top_left_x1">
+                                <div class="crafting_needed">
+                                    <div class="crafting_needed_label">Items Needed:</div>
+                                    <div class="crafting_needed_list">
+
+                                        <div class="crafting_needed_item">
+                                            <div class="crafting_needed_left">
+                                                <div class="crafting_needed_icon">
+                                                    <img src="/assets/images/bat.png">
+                                                </div>
+                                            </div>
+                                            <div class="crafting_needed_right">
+                                                <div class="crafting_needed_item_label">Amunicja</div>
+                                                <div class="crafting_needed_item_count">5x</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="top_right_x1">
+
+                                <div class="crafting_time">
+                                    <div class="crafting_time_icon"><i class="fa-sharp fa-solid fa-clock"></i></div>
+                                    <div class="crafting_time_window">
+                                        <div class="crafting_time_label">Craft Time:</div>
+                                        <div class="crafting_timing">125s</div>
+                                    </div>
+                                </div>
+
+                                <div class="crafting_count">
+                                    <div class="crafting_count_icon"><i class="fa-solid fa-hashtag"></i></div>
+                                    <div class="crafting_count_window">
+                                        <div class="crafting_count_label">Craft Count:</div>
+                                        <div class="crafting_counting">5x</div>
+                                    </div>
+                                </div>
+
+                                <div class="crafting_numbers">
+                                    <div class="crafting_number_button crafting_number_button_minus">
+                                        -
+                                    </div>
+                                    <div class="crafting_number" id="currentNumber">
+                                        1
+                                    </div>
+                                    <div class="crafting_number_button crafting_number_button_plus">
+                                        +
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="bottom_x1">
+                            <div class="craft_button">
+                                CRAFT
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom_right">
+                    <div class="bottom_right_top">
+                        <div class="bottom_right_top_title">Crafting Queue</div>
+                        <div class="bottom_right_top_desc">Items that you are crafting.</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/fontawesome.min.js"></script>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/progressbar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="js/app.js?v=1"></script>
+
+</body>
+
+</html>
