@@ -30,4 +30,4 @@ We're excited to announce that our latest script, KOJA-CRAFTING, is now availabl
 
 ## Preview
 
-[PREVIEW](https://www.discord.gg/kojascripts)
+[PREVIEW](https://www.youtube.com/watch?v=zC8iCRlmA_8&feature=youtu.be)
