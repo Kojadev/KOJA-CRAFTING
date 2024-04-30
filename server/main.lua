@@ -1,8 +1,10 @@
 local FRAMEWORK = nil
 if KOJA.Framework == "esx" then
-   TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
+    TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
 elseif KOJA.Framework == "qb" then
-   TriggerEvent('QBCore:GetObject', function(obj) FRAMEWORK = obj end)
+    TriggerEvent('QBCore:GetObject', function(obj) FRAMEWORK = obj end)
+elseif KOJA.Framework == "newesx" then
+    FRAMEWORK = exports['es_extended']:getSharedObject()
 end
 
 local cooldownTriggers = {}
