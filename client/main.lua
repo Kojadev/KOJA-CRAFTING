@@ -13,13 +13,11 @@ local PlayerData = {}
 local FRAMEWORK = nil
 
 if KOJA.Framework == "esx" then
-    Citizen.CreateThread(function()
-        while FRAMEWORK == nil do
-            TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
-            Citizen.Wait(0)
-        end
-        PlayerData = FRAMEWORK.GetPlayerData()
-    end)
+    TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
+    Citizen.Wait(250)
+    if FRAMEWORK == nil then
+        FRAMEWORK = exports.es_extended:getSharedObject()
+    end
 
     RegisterNetEvent('esx:playerLoaded')
     AddEventHandler('esx:playerLoaded', function(xPlayer)
