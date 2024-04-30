@@ -1,6 +1,10 @@
 local FRAMEWORK = nil
 if KOJA.Framework == "esx" then
-   TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
+    TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
+    Citizen.Wait(250)
+    if FRAMEWORK == nil then
+        FRAMEWORK = exports.es_extended:getSharedObject()
+    end
 elseif KOJA.Framework == "qb" then
    TriggerEvent('QBCore:GetObject', function(obj) FRAMEWORK = obj end)
 end
