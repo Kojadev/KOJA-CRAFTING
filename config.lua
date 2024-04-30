@@ -1,6 +1,6 @@
 KOJA = {
 
-    Framework = "esx", -- Choose your framework: 'esx' or 'qb'
+    Framework = "esx", -- Choose your framework: 'esx' or 'qb' or 'newesx'
     Database = "oxmysql", -- Specify your database technology: 'ghmattimysql', 'oxmysql', or 'mysql-async' (check fxmanifest.lua when you change it!)
 
     developermode = false, -- Enable or disable print outputs to the console: true enables, false disables
