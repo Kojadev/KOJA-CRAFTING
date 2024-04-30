@@ -14,6 +14,8 @@ FRAMEWORK.RegisterServerCallback('koja-crafting:getPlayerDetails', function(sour
     local xPlayer = nil
     if KOJA.Framework == 'esx' then
         xPlayer = FRAMEWORK.GetPlayerFromId(source)
+    elseif KOJA.Framework == 'newesx' then
+    xPlayer = FRAMEWORK.GetPlayerFromId(source)
     elseif KOJA.Framework == 'qb' then
         xPlayer = FRAMEWORK.Functions.GetPlayer(source)
     end
@@ -50,6 +52,8 @@ FRAMEWORK.RegisterServerCallback('koja-crafting:craftitem', function(source, cb,
     local xPlayer = nil
     if KOJA.Framework == 'esx' then
         xPlayer = FRAMEWORK.GetPlayerFromId(src)
+      elseif KOJA.Framework == 'newesx' then
+    xPlayer = FRAMEWORK.GetPlayerFromId(source)
     elseif KOJA.Framework == 'qb' then
         xPlayer = FRAMEWORK.Functions.GetPlayer(src)
     end
@@ -69,6 +73,8 @@ FRAMEWORK.RegisterServerCallback('koja-crafting:additem', function(source, cb, d
     local xPlayer = nil
     if KOJA.Framework == 'esx' then
         xPlayer = FRAMEWORK.GetPlayerFromId(src)
+    elseif KOJA.Framework == 'newesx' then
+    xPlayer = FRAMEWORK.GetPlayerFromId(source)
     elseif KOJA.Framework == 'qb' then
         xPlayer = FRAMEWORK.Functions.GetPlayer(src)
     end
@@ -83,6 +89,8 @@ AddEventHandler('koja-crafting:addXP', function(src, amount)
     local xPlayer = nil
     if KOJA.Framework == 'esx' then
         xPlayer = FRAMEWORK.GetPlayerFromId(src)
+    elseif KOJA.Framework == 'newesx' then
+    xPlayer = FRAMEWORK.GetPlayerFromId(source)
     elseif KOJA.Framework == 'qb' then
         xPlayer = FRAMEWORK.Functions.GetPlayer(src)
     end
@@ -165,6 +173,8 @@ SendLog = function(source, text, title, color)
     local xPlayer = nil
     if KOJA.Framework == 'esx' then
         xPlayer = GetPlayerFromId(_source)
+    elseif KOJA.Framework == 'newesx' then
+       xPlayer = GetPlayerFromId(_source)
     elseif KOJA.Framework == 'qb' then
         xPlayer = GetPlayer(_source)
     end
