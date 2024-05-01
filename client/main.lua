@@ -9,39 +9,37 @@ local Keys = {
 	["LEFT"] = 174, ["RIGHT"] = 175, ["TOP"] = 27, ["DOWN"] = 173,
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
-local PlayerData = {}
-local FRAMEWORK = nil
+Koja = {}
+Koja.Framework = Utils.Functions.GetFramework()
+Koja.Utils = Utils.Functions
+Koja.Callbacks = {}
+Koja.Client = {}
 
-if KOJA.Framework == "esx" then
-    Citizen.CreateThread(function()
-        while FRAMEWORK == nil do
-            TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
-            Citizen.Wait(0)
-        end
-        PlayerData = FRAMEWORK.GetPlayerData()
-    end)
+Koja.Client.TriggerServerCallback = function(key, payload, func)
+    if not func then
+        func = function() end
+    end
 
-    RegisterNetEvent('esx:playerLoaded')
-    AddEventHandler('esx:playerLoaded', function(xPlayer)
-        PlayerData = xPlayer
-    end)
-
-
-    elseif KOJA.Framework == "qb" then
-        Citizen.CreateThread(function()
-            while FRAMEWORK == nil do
-                TriggerEvent('QBCore:GetObject', function(obj) FRAMEWORK = obj end)
-                Citizen.Wait(0)
-            end
-            PlayerData = FRAMEWORK.Functions.GetPlayerData()
-        end)
-        
-        RegisterNetEvent('QBCore:PlayerLoaded')
-        AddEventHandler('QBCore:PlayerLoaded', function(xPlayer)
-            PlayerData = xPlayer
-        end)
-    
+    Koja.Callbacks[key] = func
+    TriggerServerEvent("koja-crafting:Server:HandleCallback", key, payload)
 end
+
+RegisterNetEvent("koja-crafting:Client:HandleCallback", function(key, data)
+    if Koja.Callbacks[key] then
+        Koja.Callbacks[key](data)
+        Koja.Callbacks[key] = nil
+    end
+end)
+
+
+CreateThread(function()
+    while Koja.Framework == nil do
+        Koja.Framework = Utils.Functions.GetFramework()
+        Wait(15)
+    end
+end)
+
+
 
 local tablesSpawned = false 
 
@@ -49,7 +47,7 @@ Citizen.CreateThread(function()
     if not tablesSpawned then
         local addedModels = {}
 
-        for _, data in ipairs(KOJA.props) do
+        for _, data in ipairs(Config.props) do
             local objectHash = GetHashKey(data.propnum)
 
             RequestModel(objectHash)
@@ -76,7 +74,7 @@ Citizen.CreateThread(function()
                     {
                         event = "koja_crafting:open",
                         icon = "fa-solid fa-screwdriver-wrench",
-                        label = KOJA.translation.opencrafting,
+                        label = Config.translation.opencrafting,
                     }
                 })
                 addedModels[data.propnum] = true
@@ -95,7 +93,7 @@ Citizen.CreateThread(function()
         if not ConfigLoaded then
             SendNUIMessage({
                 type = 'LoadConfig',
-                devmode = KOJA.developermode,
+                devmode = Config.developermode,
             })
             ConfigLoaded = true
         end
@@ -104,50 +102,35 @@ end)
 
 RegisterNetEvent('koja_crafting:open')
 AddEventHandler('koja_crafting:open', function()
-	FRAMEWORK.TriggerServerCallback("koja-crafting:getPlayerDetails", function(result)
-		SetNuiFocus(true,true)
-		SendNUIMessage({
-			type = "show",
+    Koja.Client.TriggerServerCallback("koja-crafting:getPlayerDetails", {}, function(result)
+        SetNuiFocus(true, true)
+        SendNUIMessage({
+            type = "show",
             currentXP = result.currentXP,
-			categories = KOJA.categories,
-			items = KOJA.items,
-			inventory = result.inventory,
-            maxlvl = KOJA.maxlvl,
-            neededxp = KOJA.neededxp,
-            translation = KOJA.translation,
-		})	
-        log("^2Loaded^0", "done")
-	end)
+            categories = Config.categories,
+            items = Config.items,
+            inventory = result.inventory,
+            maxlvl = Config.maxlvl,
+            neededxp = Config.neededxp,
+            translation = Config.translation,
+        })
+        print("[DONE] Loaded!")
+    end)    
 end)
 
 RegisterNUICallback('craftitem', function(data, cb)
-    log('Crafting: ^1' .. json.encode(data) .. '^0', 'done')
-    ESX.TriggerServerCallback("koja-crafting:craftitem", function(result)
+    Koja.Client.TriggerServerCallback("koja-crafting:craftitem", data, function(result)
         cb(result)
-	end, data)
+    end)    
 end)
 
 RegisterNUICallback('additem', function(data, cb)
-    ESX.TriggerServerCallback("koja-crafting:additem", function(result)
+    Koja.Client.TriggerServerCallback("koja-crafting:additem", data, function(result)
         cb(result)
-	end, data)
+    end)  
 end)
 
 RegisterNUICallback('closeMenu', function(data, cb)
 	SetNuiFocus(false, false)
 end)
 
-function log(message, logType)
-    local logTypes = {
-        info = "^5[KOJA_CRAFTING]^0 ^4[INFO]^0 ",
-        done = "^5[KOJA_CRAFTING]^0 ^2[DONE]^0 ",
-        err = "^5[KOJA_CRAFTING]^0 ^1[ERROR]^0 ",
-        warning = "^5[KOJA_CRAFTING]^0 ^3[WARNING]^0 ",
-    }
-
-    if KOJA.developermode then
-        local logFormat = logTypes[logType]
-        print(logFormat and logFormat .. message or message)
-    end
-    
-end
