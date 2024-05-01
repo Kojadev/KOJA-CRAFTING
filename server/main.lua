@@ -124,31 +124,28 @@ Koja.Server.RegisterServerCallback('koja-crafting:additem', function(source, dat
     end
 end)
 
-
-
 RegisterNetEvent('koja-crafting:addXP')
 AddEventHandler('koja-crafting:addXP', function(source, amount)
     local xPlayer = Koja.Server.GetPlayerBySource(source)
+    local identifier
 
-    for k,v in ipairs(GetPlayerIdentifiers(source))do
-        if string.sub(v, 1, string.len("license:")) == "license:" then
-            license = v
-        elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-            identifier = v
-        elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-            discord = v
-        end
+    if Config.Framework == "esx" then
+        identifier = xPlayer.identifier
+    elseif Config.Framework == "qb" then
+        identifier = xPlayer.PlayerData.license
     end
-    
+
     local xp_toadd = tonumber(amount)
     if xp_toadd >= 500 then
-        print("^5[Config_CRAFTING]^7 ID:"..source.." ^8IS PROBABLY CHEATING - CHECK Config LOGS^7")
-        SendLog(source, 'PLAYER GOT FLAGGED DUE TO SUSPICIOUS ACTIONS IN RESOURCE ``Config_CRAFTING`` \n Player tried to give himself OVERLIMIT XP" '..xp_toadd..' ','||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(source)..'``||', 15548997)
+        print("^5[KOJA_CRAFTING]^7 ID:"..source.." ^8IS PROBABLY CHEATING - CHECK KOJA LOGS^7")
+        SendLog(source, 'PLAYER GOT FLAGGED DUE TO SUSPICIOUS ACTIONS IN RESOURCE ``KOJA_CRAFTING`` \n Player tried to give himself OVERLIMIT XP" '..xp_toadd..' ','||``'..identifier..' \nName:'..GetPlayerName(source)..'``||', 15548997)
         return
     end
-        ExecuteSql("UPDATE koja_crafting SET currentXP = currentXP + '"..xp_toadd.."' WHERE playerid = '"..xPlayer.uid.."'")
-        SendLog(source, 'PLAYER REEDEMED '..xp_toadd..'XP ', '||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(source)..'``||', 5763719)
+    
+    ExecuteSql("UPDATE koja_crafting SET currentXP = currentXP + '"..xp_toadd.."' WHERE playerid = '"..identifier.."'")
+    SendLog(source, 'PLAYER REDEEMED '..xp_toadd..'XP ', '||``'..identifier..' \nName:'..GetPlayerName(source)..'``||', 5763719)
 end)
+
 
 function checkInventory(eq, itemList)
     local result = {}
