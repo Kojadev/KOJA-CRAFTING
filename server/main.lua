@@ -1,35 +1,62 @@
-local FRAMEWORK = nil
-if KOJA.Framework == "esx" then
-   TriggerEvent('esx:getSharedObject', function(obj) FRAMEWORK = obj end)
-elseif KOJA.Framework == "qb" then
-   TriggerEvent('QBCore:GetObject', function(obj) FRAMEWORK = obj end)
+Koja = {}
+Koja.Framework = Utils.Functions.GetFramework()
+Koja.Utils = Utils.Functions
+Koja.Server = {
+    MySQL = {
+        Async = {},
+        Sync = {}
+    }
+}
+Koja.Callbacks = {}
+Koja.Server.RegisterServerCallback = function(key, func)
+    Koja.Callbacks[key] = func
+end
+
+CreateThread(function()
+    while Koja.Framework == nil do
+        Koja.Framework = Utils.Functions.GetFramework()
+        Wait(15)
+    end
+end)
+
+RegisterNetEvent("koja-crafting:Server:HandleCallback", function(key, payload)
+    local src = source
+    if Koja.Callbacks[key] then
+        Koja.Callbacks[key](src, payload, function(cb)
+            TriggerClientEvent("koja-crafting:Client:HandleCallback", src, key, cb)
+        end)
+    end
+end)
+
+Koja.Server.GetPlayerBySource = function(source)
+    if Config.Framework == "esx" then
+        return Koja.Framework.GetPlayerFromId(source)
+    elseif Config.Framework == "qb" then
+        return Koja.Framework.Functions.GetPlayer(source)
+    end
 end
 
 local cooldownTriggers = {}
 
-
-FRAMEWORK.RegisterServerCallback('koja-crafting:getPlayerDetails', function(source, cb)
-    local xPlayer = nil
-    if KOJA.Framework == 'esx' then
-        xPlayer = FRAMEWORK.GetPlayerFromId(source)
-    elseif KOJA.Framework == 'qb' then
-        xPlayer = FRAMEWORK.Functions.GetPlayer(source)
-    end
-    local items     = {}
+Koja.Server.RegisterServerCallback('koja-crafting:getPlayerDetails', function(source, payload, cb)
+    local xPlayer = Koja.Server.GetPlayerBySource(source)
+    local items = {}
     local inventory = exports.ox_inventory:GetInventoryItems(source)
+
     for i, item in pairs(inventory) do
         if item.count > 0 then
             table.insert(items, {
-                label     = item.label,
-                amount    = item.count,
-                name      = item.name,
+                label = item.label,
+                amount = item.count,
+                name = item.name,
             })
         end
     end
+
     local callbackData = {}
-    local result = ExecuteSql("SELECT * FROM koja_crafting WHERE playerid = '"..xPlayer.uid.."'")
-    if result[1] == nil then    
-        ExecuteSql("INSERT INTO koja_crafting SET playerid = '"..xPlayer.uid.."', currentXP = '0'")
+    local result = ExecuteSql("SELECT * FROM koja_crafting WHERE playerid = '" .. xPlayer.identifier .. "'")
+    if not result or #result == 0 then    
+        ExecuteSql("INSERT INTO koja_crafting SET playerid = '" .. xPlayer.identifier .. "', currentXP = '0'")
         callbackData = {
             currentXP = 0,
             inventory = items
@@ -40,69 +67,78 @@ FRAMEWORK.RegisterServerCallback('koja-crafting:getPlayerDetails', function(sour
             inventory = items
         }
     end
-    cb(callbackData)
+
+    if type(cb) == 'function' then
+        cb(callbackData)
+    else
+        print("Error: Provided 'cb' is not a function, it is a " .. type(cb))
+    end
 end)
 
-FRAMEWORK.RegisterServerCallback('koja-crafting:craftitem', function(source, cb, data)
-    local src = source
-    local xPlayer = nil
-    if KOJA.Framework == 'esx' then
-        xPlayer = FRAMEWORK.GetPlayerFromId(src)
-    elseif KOJA.Framework == 'qb' then
-        xPlayer = FRAMEWORK.Functions.GetPlayer(src)
+
+Koja.Server.RegisterServerCallback('koja-crafting:craftitem', function(source, data, cb)
+    local xPlayer = Koja.Server.GetPlayerBySource(source)
+    if not data or type(data) ~= 'table' then
+        print("Error: Missing or incorrect data for crafting items")
+        return
     end
 
-    for i, item in ipairs(data.requireditemResp) do
-        local count = data.requireditemCount[i]
-        exports.ox_inventory:RemoveItem(src, item, count)
+    local inventoryItems = {} 
+
+    for i, item in ipairs(data.requireditemResp or {}) do
+        local count = data.requireditemCount[i] or 0
+        exports.ox_inventory:RemoveItem(source, item, count)
     end
 
-    cb({
-        inventory = inventoryItems 
-    })
+    if type(cb) == 'function' then
+        cb({ inventory = inventoryItems })
+    else
+        print("Error: Callback function is missing or not a function")
+    end
 end)
 
-FRAMEWORK.RegisterServerCallback('koja-crafting:additem', function(source, cb, data)
-    local src = source
-    local xPlayer = nil
-    if KOJA.Framework == 'esx' then
-        xPlayer = FRAMEWORK.GetPlayerFromId(src)
-    elseif KOJA.Framework == 'qb' then
-        xPlayer = FRAMEWORK.Functions.GetPlayer(src)
+
+Koja.Server.RegisterServerCallback('koja-crafting:additem', function(source, data, cb)
+    local xPlayer = Koja.Server.GetPlayerBySource(source)
+
+    if not data or type(data) ~= 'table' then
+        print("Error: Missing or incorrect data for adding items")
+        return
     end
 
-    exports.ox_inventory:AddItem(src, data.itemResp, data.itemCount)
+    exports.ox_inventory:AddItem(source, data.itemResp, data.itemCount)
+
+    if type(cb) == 'function' then
+        cb({success = true}) 
+    else
+        print("Error: Callback function is missing or not a function")
+    end
 end)
 
 
 
 RegisterNetEvent('koja-crafting:addXP')
-AddEventHandler('koja-crafting:addXP', function(src, amount)
-    local xPlayer = nil
-    if KOJA.Framework == 'esx' then
-        xPlayer = FRAMEWORK.GetPlayerFromId(src)
-    elseif KOJA.Framework == 'qb' then
-        xPlayer = FRAMEWORK.Functions.GetPlayer(src)
-    end
+AddEventHandler('koja-crafting:addXP', function(source, amount)
+    local xPlayer = Koja.Server.GetPlayerBySource(source)
 
-    for k,v in ipairs(GetPlayerIdentifiers(src))do
+    for k,v in ipairs(GetPlayerIdentifiers(source))do
         if string.sub(v, 1, string.len("license:")) == "license:" then
-           license = v
+            license = v
         elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-           identifier = v
+            identifier = v
         elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-           discord = v
+            discord = v
         end
-     end
+    end
+    
     local xp_toadd = tonumber(amount)
     if xp_toadd >= 500 then
-        print("^5[KOJA_CRAFTING]^7 ID:"..src.." ^8IS PROBABLY CHEATING - CHECK KOJA LOGS^7")
-        SendLog(src, 'PLAYER GOT FLAGGED DUE TO SUSPICIOUS ACTIONS IN RESOURCE ``KOJA_CRAFTING`` \n Player tried to give himself OVERLIMIT XP" '..xp_toadd..' ','||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(src)..'``||', 15548997)
+        print("^5[Config_CRAFTING]^7 ID:"..source.." ^8IS PROBABLY CHEATING - CHECK Config LOGS^7")
+        SendLog(source, 'PLAYER GOT FLAGGED DUE TO SUSPICIOUS ACTIONS IN RESOURCE ``Config_CRAFTING`` \n Player tried to give himself OVERLIMIT XP" '..xp_toadd..' ','||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(source)..'``||', 15548997)
         return
     end
-     ExecuteSql("UPDATE koja_crafting SET currentXP = currentXP + '"..xp_toadd.."' WHERE playerid = '"..xPlayer.uid.."'")
-     SendLog(src, 'PLAYER REEDEMED '..xp_toadd..'XP ', '||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(src)..'``||', 5763719)
-      
+        ExecuteSql("UPDATE koja_crafting SET currentXP = currentXP + '"..xp_toadd.."' WHERE playerid = '"..xPlayer.uid.."'")
+        SendLog(source, 'PLAYER REEDEMED '..xp_toadd..'XP ', '||``'..identifier..' \n'..license..' \n'..discord..'\nName:'..GetPlayerName(source)..'``||', 5763719)
 end)
 
 function checkInventory(eq, itemList)
@@ -127,64 +163,56 @@ end
 function ExecuteSql(query)
     local IsBusy = true
     local result = nil
-    if KOJA.Database == "oxmysql" then
-       if MySQL == nil then
-          exports.oxmysql:execute(query, function(data)
-          result = data
-          IsBusy = false
-          end)
-       else
-          MySQL.query(query, {}, function(data)
-          result = data
-          IsBusy = false
-          end)
-       end
-    elseif KOJA.Database == "ghmattimysql" then
-       exports.ghmattimysql:execute(query, {}, function(data)
-       result = data
-       IsBusy = false
-       end)
-    elseif KOJA.Database == "mysql-async" then
-       MySQL.Async.fetchAll(query, {}, function(data)
-       result = data
-       IsBusy = false
-       end)
+    if Config.Database == "oxmysql" then
+        if MySQL == nil then
+            exports.oxmysql:execute(query, function(data)
+                result = data
+                IsBusy = false
+            end)
+        else
+            MySQL.query(query, {}, function(data)
+                result = data
+                IsBusy = false
+            end)
+        end
+    elseif Config.Database == "ghmattimysql" then
+        exports.ghmattimysql:execute(query, {}, function(data)
+            result = data
+            IsBusy = false
+        end)
+    elseif Config.Database == "mysql-async" then
+        MySQL.Async.fetchAll(query, {}, function(data)
+            result = data
+            IsBusy = false
+        end)
     end
     while IsBusy do
-       Citizen.Wait(0)
+        Citizen.Wait(0)
     end
     return result
- end
-
-print(WebhookSupportURL)
+end
 
 SendLog = function(source, text, title, color)
-    local _source = source
-    local xPlayer = nil
-    if KOJA.Framework == 'esx' then
-        xPlayer = GetPlayerFromId(_source)
-    elseif KOJA.Framework == 'qb' then
-        xPlayer = GetPlayer(_source)
-    end
+    local xPlayer = Koja.Server.GetPlayerBySource(source)
 
     local embed = {
-       {
-          ["avatar_url"] = WebhookAvatarURL,
-          ["username"] = WebhookUsername,
-          ["author"] = {
-             ["name"] = WebhookUsername .. " | CLICK FOR SUPPORT",
-             ["url"] = WebhookSupportURL,
-             ["icon_url"] = WebhookAvatarURL,
-          },
-          ["color"] = color,
-          ["title"] = title,
-          ["description"] = text,
-          ["type"]= "rich",
-          ["footer"] = {
-             ["text"] = os.date() .. " | KOJA-SCRIPTS - Logs System",
-             ["icon_url"] = WebhookAvatarURL,
-          },
-       }
+        {
+            ["avatar_url"] = WebhookAvatarURL,
+            ["username"] = WebhookUsername,
+            ["author"] = {
+                ["name"] = WebhookUsername .. " | CLICK FOR SUPPORT",
+                ["url"] = WebhookSupportURL,
+                ["icon_url"] = WebhookAvatarURL,
+            },
+            ["color"] = color,
+            ["title"] = title,
+            ["description"] = text,
+            ["type"]= "rich",
+            ["footer"] = {
+                ["text"] = os.date() .. " | Koja-SCRIPTS - Logs System",
+                ["icon_url"] = WebhookAvatarURL,
+            },
+        }
     }
 
     PerformHttpRequest(WebhookURL, function(err, text, headers) end, 'POST', json.encode({username = WebhookUsername, avatar_url = WebhookAvatarURL, embeds = embed}), { ['Content-Type'] = 'application/json' })
