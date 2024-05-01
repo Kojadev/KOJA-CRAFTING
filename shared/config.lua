@@ -1,4 +1,4 @@
-KOJA = {
+Config = {
 
     Framework = "esx", -- Choose your framework: 'esx' or 'qb'
     Database = "oxmysql", -- Specify your database technology: 'ghmattimysql', 'oxmysql', or 'mysql-async' (check fxmanifest.lua when you change it!)
@@ -69,13 +69,12 @@ KOJA = {
             category = "weapons",
             type = "Pistol",
             label = "Pistol",
-            time = 10,
+            time = 1,
             level = 0,
             count = 1,
             respname = "weapon_pistol",
             desc = "Type: Handgun<br>Manufacturer: Hawk & Little<br>Model: Standard Pistol<br>Category: Firearm",
             required_items = {
-                {item = "metal", label = "Metal", count = 10},
                 {item = "spring", label = "Spring", count = 1},
                 {item = "nail", label = "Nail", count = 5},
             }
