@@ -40,6 +40,14 @@ local cooldownTriggers = {}
 
 Koja.Server.RegisterServerCallback('koja-crafting:getPlayerDetails', function(source, payload, cb)
     local xPlayer = Koja.Server.GetPlayerBySource(source)
+    local identifier = nil
+
+    if Config.Framework == "esx" then
+        identifier = xPlayer.identifier 
+    elseif Config.Framework == "qb" then
+        identifier = xPlayer.PlayerData.license
+    end
+
     local items = {}
     local inventory = exports.ox_inventory:GetInventoryItems(source)
 
@@ -54,9 +62,9 @@ Koja.Server.RegisterServerCallback('koja-crafting:getPlayerDetails', function(so
     end
 
     local callbackData = {}
-    local result = ExecuteSql("SELECT * FROM koja_crafting WHERE playerid = '" .. xPlayer.identifier .. "'")
+    local result = ExecuteSql("SELECT * FROM koja_crafting WHERE playerid = '" .. identifier .. "'")
     if not result or #result == 0 then    
-        ExecuteSql("INSERT INTO koja_crafting SET playerid = '" .. xPlayer.identifier .. "', currentXP = '0'")
+        ExecuteSql("INSERT INTO koja_crafting SET playerid = '" .. identifier .. "', currentXP = '0'")
         callbackData = {
             currentXP = 0,
             inventory = items
@@ -74,6 +82,7 @@ Koja.Server.RegisterServerCallback('koja-crafting:getPlayerDetails', function(so
         print("Error: Provided 'cb' is not a function, it is a " .. type(cb))
     end
 end)
+
 
 
 Koja.Server.RegisterServerCallback('koja-crafting:craftitem', function(source, data, cb)
