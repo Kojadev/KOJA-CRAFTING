@@ -3,23 +3,24 @@ fx_version 'cerulean'
 game 'gta5'
 
 lua54 'on'
-author 'Koja-Scripts'
-description 'Crafting System'
-version '1.0'
+name "Koja-Crafting"
+author "KojaScripts <discord.gg/kojascripts>"
+version "1.1.0"
+description "Koja Crafting System"
 
-shared_script {
-	'config.lua',
+
+shared_scripts {
+    "@ox_lib/init.lua", -- if you are using ox
+    "shared/**/*"
 }
 
 client_scripts {
-	'client/main.lua',
+	'client/main.lua'
 }
 
 server_scripts {
-	'@oxmysql/lib/MySQL.lua',
-	--'@mysql-async/lib/MySQL.lua',
-	'config.lua',
-	'server_config.lua',
+	'@oxmysql/lib/MySQL.lua', -- if you are using oxmysql
+	--'@mysql-async/lib/MySQL.lua', -- if you are using mysql
 	'server/main.lua',
 }
 
@@ -32,11 +33,6 @@ files {
 	'assets/images/*.png',
 	'assets/js/*.js'
 }
-
-escrow_ignore {
-	'config.lua',
-	'server_config.lua',
-}   
 
 ui_page "assets/ui.html"
 
